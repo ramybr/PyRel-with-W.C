@@ -19,19 +19,6 @@ Stocks = M.Type("Stocks", source="POV_TEAM.RAMYBR_DT.STOCKS")
 Stores = M.Type("Stores", source="POV_TEAM.RAMYBR_DT.SOTRES")
 
 
-
-with M.rule():
-    b = Brands()
-    Brands.add(id=b.brand_id).set(name=b.brand_name)
-
-with M.rule():
-    c = Categories()
-    Categories.add(id=c.category_id).set(name=c.category_name)
-
-
-
-
-
 with M.rule():
     prd = Products()
     brnd = Brands(id=prd.brand_id)
