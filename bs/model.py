@@ -18,6 +18,24 @@ Staff = M.Type("Staffs", source="POV_TEAM.RAMYBR_DT.STAFFS")
 Stocks = M.Type("Stocks", source="POV_TEAM.RAMYBR_DT.STOCKS")
 Stores = M.Type("Stores", source="POV_TEAM.RAMYBR_DT.SOTRES")
 
+People = M.type("People")
+
+with M.rule():
+    p = People()
+    cst = Customers()
+    stf = Staff()
+
+    p.customers.add(cst)
+    p.staff.add(stf)
+
+# with M.query() as select:
+#     p = People()
+#     res = select(
+#         p.customers.id,
+#         p.staff.id
+#     )
+#     print(res.results.head())
+
 
 with M.rule():
     prd = Products()
