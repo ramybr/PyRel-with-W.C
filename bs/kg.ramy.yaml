@@ -1,0 +1,46 @@
+rai_schema: bs_test_r
+
+engine:
+  name: RAMY
+  size: HIGHMEM_X64_S
+  keep: true
+
+imports:
+  - id: brands
+    fqn: pov_team.ramybr_dt.brands
+  - id: categories
+    fqn: pov_team.ramybr_dt.categories
+  - id: customers
+    fqn: pov_team.ramybr_dt.customers
+  - id: order_items
+    fqn: pov_team.ramybr_dt.order_items
+  - id: orders
+    fqn: pov_team.ramybr_dt.orders
+  - id: products
+    fqn: pov_team.ramybr_dt.products
+  - id: staffs
+    fqn: pov_team.ramybr_dt.staffs
+  - id: stocks
+    fqn: pov_team.ramybr_dt.stocks
+  - id: stores
+    fqn: pov_team.ramybr_dt.stores
+
+flags:
+  use_value_types: true
+  use_multi_valued: true
+  isolated: false
+  debug: true
+  use_graph_index: true
+  use_inlined_intermidiates: false
+  use_monotype_operators: true
+  wait_for_stream_sync: false
+
+env:
+  # input_schema: mars_wt_kg_qa.public
+  source_schema: pov_team.ramybr_dt
+  output_schema: pov_team.ramybr_dt
+  engine_lock_table: rb2p_dev.public.engine_lock
+  job_warehouse: rb2p_dev_wh
+  compute_pool: RAI_MLDS_COMPUTE_POOL
+  # image: /rb2p_dev/public/images:latest
+  external_access_integration: s3_presigned_url
