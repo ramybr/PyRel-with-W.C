@@ -49,7 +49,7 @@ with M.rule():
     stf = Staff()
     ordr = Orders(customer_id=cst.customer_id, staff_id=stf.staff_id)
     cst.knows.add(stf)
-    stf.knows(cst)
+    stf.knows.add(cst)
 
 with M.rule():
     cst = Customers()
