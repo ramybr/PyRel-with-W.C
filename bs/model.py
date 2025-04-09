@@ -28,21 +28,39 @@ People = M.type("People")
 #     )
 # print(res.results.head())
 
-with M.rule():
-    p = People()
-    cst = Customers()
-    stf = Staff()
+# with M.rule():
+#     p = People()
+#     cst = Customers()
+#     stf = Staff()
 
-    p.customers.add(cst)
-    p.staff.add(stf)
+#     p.customers.add(cst)
+#     p.staff.add(stf)
+
+
+with M.rule():
+    cst = Customers()
+    cust.set(People)
+
+with M.rule():
+    stf = Staff()
+    stf.set(People)
 
 # with M.query() as select:
 #     p = People()
 #     res = select(
-#         p.customers.id,
-#         p.staff.id
+#         p.id,
 #     )
 #     print(res.results.head())
+
+
+# using People
+# with M.rule():
+#     p1 = People()
+#     p2 = People()
+#     ordr = Orders(customer_id=p1.id, staff_id=p2.id)
+#     p1.knows.add(p2)
+#     p2.knows.add(p1)
+
 
 with M.rule():
     cst = Customers()
@@ -52,14 +70,16 @@ with M.rule():
     stf.knows.add(cst)
 
 with M.rule():
-    cst = Customers()
-    c_ordr = Orders(customer_id=cst.customer_id)
-    c_ordr_itm = OrderItems(order_id=c_ordr.order_id)
-    c_prd = Products(product_id=c_ordr_itm.product_id)
-    c_cat = Categories(category_id=c_prd.category_id)
-    count_categories = aggregates.count(c_cat.category_name, per=[c_cat])
-    fav_cat = top(1, count_categories)
-    cst.has_favorite_category.set(fav_cat)
+    ordr = Orders() 
+    cst = ordr.has_customer
+    ordr_itm = OrderItems(order_id=ordr.order_id) # ordr_itm = ordr.has_order_items
+    prd = Products(product_id=ordr_itm.product_id) # prd = ordr_itm.has_product
+    cat = Categories(category_id=prd.category_id) # cat = prd.has_category
+    count_categories = aggregates.count(cat.category_name, per=[cat])
+    rank_des(count_categories, per=[cst]) == 1
+    # fav_cat = top(1, count_categories)
+    # cst.has_favorite_category.set(cat)  Commented cus wrong
+    cst.set(has_favorite_category=cat)
 
 with M.rule():
     prd = Products()
