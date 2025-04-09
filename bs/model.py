@@ -1,5 +1,5 @@
 import relationalai as rai
-from relationalai.std import aggregates
+from relationalai.std import aggregates, top
 from relationalai.std.graphs import Graph
 
 provider = rai.Provider()
@@ -20,6 +20,14 @@ Stores = M.Type("Stores", source="POV_TEAM.RAMYBR_DT.SOTRES")
 
 People = M.type("People")
 
+# with M.query() as select:
+#     b = Brands()
+#     res = select(
+#         b.brand_id,
+#         b.brand_name
+#     )
+# print(res.results.head())
+
 with M.rule():
     p = People()
     cst = Customers()
@@ -36,6 +44,22 @@ with M.rule():
 #     )
 #     print(res.results.head())
 
+with M.rule():
+    cst = Customers()
+    stf = Staff()
+    ordr = Orders(customer_id=cst.customer_id, staff_id=stf.staff_id)
+    cst.knows.add(stf)
+    stf.knows(cst)
+
+with M.rule():
+    cst = Customers()
+    c_ordr = Orders(customer_id=cst.customer_id)
+    c_ordr_itm = OrderItems(order_id=c_ordr.order_id)
+    c_prd = Products(product_id=c_ordr_itm.product_id)
+    c_cat = Categories(category_id=c_prd.category_id)
+    count_categories = aggregates.count(c_cat.category_name, per=[c_cat])
+    fav_cat = top(1, count_categories)
+    cst.has_favorite_category.set(fav_cat)
 
 with M.rule():
     prd = Products()
