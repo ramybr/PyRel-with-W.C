@@ -1,5 +1,5 @@
 import relationalai as rai
-from relationalai.std import aggregates, top
+from relationalai.std import aggregates, top, rank_des
 from relationalai.std.graphs import Graph
 
 provider = rai.Provider()
@@ -39,7 +39,7 @@ People = M.type("People")
 
 with M.rule():
     cst = Customers()
-    cust.set(People)
+    cst.set(People)
 
 with M.rule():
     stf = Staff()
@@ -69,17 +69,6 @@ with M.rule():
     cst.knows.add(stf)
     stf.knows.add(cst)
 
-with M.rule():
-    ordr = Orders() 
-    cst = ordr.has_customer
-    ordr_itm = OrderItems(order_id=ordr.order_id) # ordr_itm = ordr.has_order_items
-    prd = Products(product_id=ordr_itm.product_id) # prd = ordr_itm.has_product
-    cat = Categories(category_id=prd.category_id) # cat = prd.has_category
-    count_categories = aggregates.count(cat.category_name, per=[cat])
-    rank_des(count_categories, per=[cst]) == 1
-    # fav_cat = top(1, count_categories)
-    # cst.has_favorite_category.set(cat)  Commented cus wrong
-    cst.set(has_favorite_category=cat)
 
 with M.rule():
     prd = Products()
@@ -121,3 +110,15 @@ with M.rule():
 
     oi.in_order.set(ordr)
     oi.has_product.set(prd)
+
+with M.rule():
+    ordr = Orders() 
+    cst = ordr.has_customer
+    ordr_itm = OrderItems(order_id=ordr.order_id) # ordr_itm = ordr.has_order_items
+    prd = Products(product_id=ordr_itm.product_id) # prd = ordr_itm.has_product
+    cat = Categories(category_id=prd.category_id) # cat = prd.has_category
+    count_categories = aggregates.count(cat.category_name, per=[cat])
+    rank_des(count_categories, per=[cst]) == 1
+    # fav_cat = top(1, count_categories)
+    # cst.has_favorite_category.set(cat)  Commented cus wrong
+    cst.set(has_favorite_category=cat)

@@ -1,18 +1,18 @@
 
 
-def define_report():
-    from relationalai.std import aggregates, strings
-    from bs.model import M
-    from bs.model import Customers, Orders, OrderItems
+# def define_report():
+from relationalai.std import aggregates, strings
+from bs.model import M
+from bs.model import Customers, Orders, OrderItems
     
 
 
-    CustomerOrderSummary = M.Type("CustomerOrderSummary")
+CustomerOrderSummary = M.Type("CustomerOrderSummary")
 
-    with M.rule():
+with M.rule():
         c = Customers()
         CustomerOrderSummary.add(id=c.id)
-    with M.rule():
+with M.rule():
         c = Customers()
         cos = CustomerOrderSummary()
         cos.set(
@@ -20,7 +20,7 @@ def define_report():
             email=c.email
         )
     
-    with M.rule():
+with M.rule():
         o = Orders()
         cos = CustomerOrderSummary()
         orders = o(customer_id=cos.customer_id)
@@ -29,7 +29,7 @@ def define_report():
             last_order_date=aggregates.max(orders.order_date)
         )
 
-    with M.rule():
+with M.rule():
         cos = CustomerOrderSummary()
         o = Orders(customer_id=cos.customer_id)
         item = OrderItems(order_id=o.id)
@@ -40,9 +40,9 @@ def define_report():
             total_items=aggregates.count(item)
         )
 
-    def report_query():
+with M.query(format="snowpark") as select:
         cos = CustomerOrderSummary()
-        return(
+        response = select(
             cos.name,
             cos.email,
             cos.total_orders,
@@ -51,7 +51,8 @@ def define_report():
             cos.avg_order_value,
             cos.total_items
         )  
-    return report_query
+    
+response.results.write.save_as_table("pov_team.ramybr_dd.customer_order_summary")
 
 
 
