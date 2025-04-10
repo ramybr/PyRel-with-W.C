@@ -2,8 +2,8 @@
 
 # def define_report():
 from relationalai.std import aggregates, strings
-from bs.model import M
-from bs.model import Customers, Orders, OrderItems
+from model import M
+from model import Customers, Orders, OrderItems
     
 
 
@@ -11,19 +11,21 @@ CustomerOrderSummary = M.Type("CustomerOrderSummary")
 
 with M.rule():
         c = Customers()
-        CustomerOrderSummary.add(id=c.id)
+        CustomerOrderSummary.add(id=c)
+
 with M.rule():
         c = Customers()
         cos = CustomerOrderSummary()
         cos.set(
-            name=strings.concat(c.first_name, " ", c.last_name),
-            email=c.email
+            name=strings.concat(cos.id.first_name, " ", cos.id.last_name),
+            email=cos.id.email
         )
+
     
 with M.rule():
-        o = Orders()
         cos = CustomerOrderSummary()
-        orders = o(customer_id=cos.customer_id)
+        cst = Customers()
+        orders = cst.has_order
         cos.set(
             total_orders=aggregates.count(orders),
             last_order_date=aggregates.max(orders.order_date)
@@ -31,9 +33,9 @@ with M.rule():
 
 with M.rule():
         cos = CustomerOrderSummary()
-        o = Orders(customer_id=cos.customer_id)
-        item = OrderItems(order_id=o.id)
-        item_value = item.quantity * item.listing_price * (1 - item.discount.or_(0))
+        ordr = Orders()
+        item = ordr.has_items
+        item_value = item.quantity * item.list_price * (1 - item.discount.or_(0))
         cos.set(
             lifetime_value=aggregates.sum(item_value),
             avg_order_value=aggregates.avg(item_value),
@@ -52,7 +54,9 @@ with M.query(format="snowpark") as select:
             cos.total_items
         )  
     
-response.results.write.save_as_table("pov_team.ramybr_dd.customer_order_summary")
+# response.results.write.mode("overwrite").save_as_table("pov_team.ramybr_dd.customer_order_summary")
+response.results.show()
+
 
 
 
